@@ -138,8 +138,9 @@ class IdentityServiceContext(OSContextGenerator):
                 # If using keystone v3 the context is incomplete without the
                 # admin domain id
                 if local_ctxt['api_version'] == '3':
-                    local_ctxt['admin_domain_id'] = rdata.get(
-                        'admin_domain_id')
+                    if not config('default_domain'):
+                        local_ctxt['admin_domain_id'] = rdata.get(
+                            'admin_domain_id')
                 if not context_complete(local_ctxt):
                     continue
 
@@ -201,6 +202,9 @@ class HorizonContext(OSContextGenerator):
             "password_retrieve": config("password-retrieve"),
             'virtualenv': git_pip_venv_dir(projects_yaml)
             if config('openstack-origin-git') else None,
+            'default_domain': config('default_domain')
+            if config('default_domain') else 'default',
+            'multi_domin': False if config('default_domain') else True
         }
 
         return ctxt
